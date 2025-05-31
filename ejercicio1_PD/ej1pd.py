@@ -1,8 +1,11 @@
 import time
+import random
+import string
 
 def min_palindromos(palabra):
     t1 = time.time()
     n = len(palabra)
+    palabra = palabra.upper()
 
     opt = [float('inf')] * (n + 1)
     opt[n] = 0
@@ -23,6 +26,19 @@ def min_palindromos(palabra):
 
     print(opt[0])
     print("Tiempo de ejecución:", t2 - t1)
+    print("\n\n")
     return opt[0]
 
-min_palindromos("ARACALACANA")
+
+if __name__ == "__main__":
+
+    archivo_lectura = "set_datos_1.txt"
+    archivo_escritura = "resultados.txt"
+
+    with open(archivo_lectura, 'r') as f:
+        with open(archivo_escritura, 'w') as fw:
+            for linea in f:
+                palabra = linea.strip()
+                resultado = min_palindromos(palabra)
+                fw.write(f"{palabra}: {resultado}\n")
+
