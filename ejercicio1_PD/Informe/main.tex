@@ -1,0 +1,173 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[a4paper, left=30mm, right=30mm, top=30mm, bottom=30mm, marginpar=25mm]{geometry}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\setlength{\headheight}{29.5pt}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\renewcommand{\contentsname}{Índice}
+
+\renewcommand*{\maketitle}{
+\thispagestyle{plain}
+\begin{center}
+    \includegraphics[width=7cm]{Logo-fiuba.png} 
+    \\[1cm]
+    \textsc{\Large Teoría de Algoritmos}\\           
+    \textsc{\small Curso Echevarria}\\[0.4cm]    
+    { \huge \bfseries Trabajo Práctico 1 }\\[0.3cm]      
+    \rule{\textwidth}{0.4pt} \\[0.2cm] 
+    {\large \today  \\[0.4cm]}                          
+    \begin{minipage}{0.4\textwidth}
+    \begin{flushleft}
+        \large{
+        \begin{itemize}
+            \item Juan Claros - 111254
+            \item Yoel Gaston Arlia - 111520
+            \item Guido Cuppari - 111172
+            \item Josue Daniel Mamani - 111514
+        \end{itemize}
+        }
+    \end{flushleft}
+\end{minipage}
+
+\end{center}
+}
+
+\title{x}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+\section{Problema 1}
+\subsection{Supuestos}
+\begin{itemize}
+    \item Se supone que el algoritmo recibe una cadena con los palindromos, y el algoritmo buscara la minima cantidad de palindromos posibles que forma la cadena dada por parametro, mediante programacion dinamica.
+\end{itemize}
+\subsection{Diseño}
+\begin{itemize}
+\item La ecuacion de recurrencia a la que se llego es: \(opt[i] = 1\) si \(palabra[i:]\) es palindromo y \(opt[i] = min(opt[j+1] + 1)\) para todo j tal que \(palabra[i:j+1]\) es palindromo.
+
+\item Subestructura óptima: La solución óptima para el prefijo \(palabra[0:i]\) depende de las soluciones óptimas de los sufijos \(palabra[j+1:]\), que son subproblemas del problema original.
+
+Subproblemas superpuestos: Evaluar si una subcadena es palíndromo se repite muchas veces. Por eso se usa una tabla booleana \(\texttt{es\_palindromo}[i][j]\) para memorizar los resultados.
+
+\item Se usa memoization en 2 estructuras de datos, para guardar en un arreglo de enteros (todos infinitos positivos de base) \(opt[i]\) el minimo numero de palindromos para \(palabra[i:]\). Y para guardar en una matriz booleana (con todas las posiciones false de base) de n x n \(\texttt{es\_palindromo}[i][j]\) si \(palabra[i:j+1]\) es un palindromo.
+
+\subsection{Pseudocodigo}
+	\begin{lstlisting}[frame=single]
+def min_palindromos(palabra):
+    n = len(palabra)
+    
+    opt = [float('inf')] * (n + 1)
+    opt[n] = 0
+
+    es_palindromo = [[False] * n for _ in range(n)]
+
+    for i in range(n - 1, -1, -1):
+        for j in range(i, n):
+            if palabra[i] == palabra[j] and (j - i <= 1 or es_palindromo[i + 1][j - 1]):
+                es_palindromo[i][j] = True
+
+    for i in range(n - 1, -1, -1):
+        for j in range(i, n):
+            if es_palindromo[i][j]:
+                opt[i] = min(opt[i], 1 + opt[j + 1])
+
+    return opt[0]
+
+cadena = "ALLAERRESAGASRADAR"
+print(min_palindromos(cadena))
+	\end{lstlisting}
+
+\end{itemize}
+
+\subsection{Analisis de Complejidad}
+\begin{itemize}
+    \item Los puntos clave para analizar la complejidad de este algoritmo son los 2 for anidados que hay tanto para el procesamiento de los palindromos que se ejecuta para cada par i,j en:
+    
+	\begin{lstlisting}[frame=single]
+    for i in range(n - 1, -1, -1):
+        for j in range(i, n):
+            if palabra[i] == palabra[j] and (j - i <= 1 or es_palindromo[i + 1][j - 1]):
+                es_palindromo[i][j] = True
+	\end{lstlisting}
+
+    Y para la construccion de la tabla booleana opt[i][j] que tambien revisa cada subcadena \(palabra[i:j+1]\), y si la misma es palindromo realiza una operacion constante en: 
+
+    \begin{lstlisting}[frame=single]
+    for i in range(n - 1, -1, -1):
+        for j in range(i, n):
+            if es_palindromo[i][j]:
+                opt[i] = min(opt[i], 1 + opt[j + 1])
+	\end{lstlisting}
+
+    Por lo tanto, en ambos for anidados, el peor caso implica una doble iteracion sobre n, por ende la complejidad temporal total del algoritmo es de \(O(N^2)\). 
+
+\end{itemize}
+\subsection{Seguimiento}
+\begin{itemize}
+\item Vamos a hacer el seguimiento para el caso de la cadena "ARACALACANA": lo primero que hace el algoritmo es obtener el largo de la cadena recibida mediante len(), y procede a generar las 2 estructuras utilizadas, la lista de enteros y la matriz de booleanos, para luego llegar a la primer parte importante, el preprocesamiento de los palindromos, donde se marca como True toda subcadena de \(palabra[i:j+1]\) que sea un palindromo.
+
+\item Para ver si un substring es palindromo o no, se utilizan 3 factores, si palabra[i] = palabra[j] (la palabra empieza y termina con la misma letra) y si \(j - i  <= 1\) (es de 1 o 2 caracteres) o \(\texttt{es\_palindromo}[i+1][j-1]\) = True. Entonces empieza desde i = 10 y siempre lo primero que llena en cada i es la diagonal, que es trivialmente un palindromo, al ser un solo caracter, pero empieza llenando la matriz desde el final.
+
+\item La primer posicion analizada es [10][10], siendo la cadena "A", que es un caso trivial, cumpliendo la condicion y llenando la tabla en esa posicion con True, luego sigue [9][9], que ocurre lo mismo que en el caso anterior, siendo simplemente el caracter "N", [9][10] no cumple la condicion, ya que no empieza y termina con la misma letra, quedandose en False..., saltamos al ejemplo del siguiente palindromo no trivail, que es [8][10] la cadena "ANA" cumple que empieza y termina con la misma letra, no tiene menos de 2 caracteres, pero \(\texttt{es\_palindromo}[i+1][j-1]\) que en este caso es [9][9] es True, entonces rellena True dandola como palindromo.
+
+\item Para el final de las iteraciones el algoritmo rellena la tabla ubicando True en todos los palindromos que encuentra.
+
+\item Una vez rellenada la tabla, pasa a la construccion de opt[i] buscando la minima cantidad de palindromos de la palabra, donde opt[n] = 0, siendo el caso base la string vacia, luego empieza la iteracion desde i = 10 hasta 0.
+
+\item Entonces empieza con [10][10], le pregunta a la tabla si es palindromo, en este caso lo es, por ende opt[i] es igual al minimo entre si mismo, que de base es infinito, y 1 + opt[j+1], que en este caso es 1 + opt[11] (que es 0), entonces opt[10] = 1. Sigue con i = 9, j = 9, se le pregunta si la [9][9] es True, lo cual es correcto, entonces se usa la ecuacion siendo opt[9] = min(opt[9], 1 + opt[10], que termina siendo opt[9] = min(infinito, 2), opt[9] = 2, y asi sigue con toda la tabla para finalmente encontrar el optimo que es 3.
+
+\end{itemize}
+\subsection{Casos de prueba y mediciones}
+\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{}
+	\end{figure}
+\subsection{Resultados}
+\begin{itemize}
+    \item Los resultados, segun la cantidad de particulas con las cantidades de 100, 200, 400, 600, 800 y 1000, son los esperados y coinciden con la complejidad.
+\end{itemize}
+\subsection{Generacion de sets}
+\begin{itemize}
+    \item Los sets son realizados a partir de una funcion randomizada, que generan archivos de texto con listas que representan las cargas a probar.
+\end{itemize}
+
+\end{document}
