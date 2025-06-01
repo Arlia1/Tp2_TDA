@@ -45,7 +45,7 @@ def asignar_respaldo(distancias, D, b, k):
                     resultado[i].append(j)
     print(resultado)
     t2 = time.time()
-    print(t1-t2)
+    print(t2-t1)
     return resultado
 
 
