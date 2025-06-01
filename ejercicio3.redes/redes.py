@@ -40,5 +40,5 @@ def asignar_respaldo(distancias, D, b, k):
                 salida = f'out_{j}'
                 if flujo[entrada].get(salida, 0) == 1:
                     resultado[i].append(j)
-
+    print(resultado)
     return resultado
