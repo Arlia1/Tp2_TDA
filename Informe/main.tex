@@ -42,6 +42,13 @@
 \usepackage{adjustbox}
 \usepackage{tikz}
 \usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{hyperref}
 \renewcommand{\contentsname}{Índice}
 
 \renewcommand*{\maketitle}{
@@ -365,4 +372,383 @@ Restricciones del modelo:
     \item Cliente E ofrece USD 5000 por ocupar 2 paradas 
 \end{itemize}
     Con estos resultados nos queda una ganancia de USD 255000 y la cantidad de paradas utilizadas para la publicidad son de 187, la cantidad de paradas no llega al limite pero tampoco se puede utilizar para darles publicidad a otros clientes porque las paradas requeridas por los otros clientes es mayor a la disponible.
+
+    \newpage
+\section{{\uline{\textbf{\textit{Problema 3}}}}}
+\subsection{Enunciado y Supuestos}
+\begin{itemize}
+    \subsubsection{Enunciado}
+    \item Estamos construyendo una red WAN con n antenas y queremos que tenga un buen nivel de tolerancia a fallas. Dada una antena, su conjunto de backup de tamaño k es el conjunto de k antenas que se encuentran a una distancia menor a D. Queremos evitar que una antena pertenezca al conjunto de backup de más de b antenas, precisamente para evitar que un fallo pueda afectar a una porción importante de la red. Suponer que conocemos los valores D, b y k, y que tenemos una matriz d[1..n, 1..n] con las distancias entre antenas, de forma tal que d[i,j] es la distancia entre la antena i y la j. 
+    
+    Plantear un algoritmo de complejidad polinomial que encuentre el conjunto de backup de tamaño k de cada una de las n antenas, de forma tal que ninguna aparezca en más de b conjuntos de backup, o bien, que indique que no existe una solución posible. Debe apoyarse en el algoritmo estándar de Ford-Fulkerson, la variante escalada o la de Edmonds-Karp.
+    \subsubsection{Supuestos}
+    \item
+    \begin{enumerate}[label=\arabic*.]
+        \item \textbf{Datos de Entrada:} Se dispone de una matriz de distancias \(d[1 \dots n,\,1 \dots n]\) donde \(d[i,j]\) es la distancia entre la antena \(i\) y la \(j\). Se asume que dicha matriz está completa, es decir, se conocen todas las distancias relevantes para la red.
+        \item \textbf{Distancia Umbral:} Solo se consideran como candidatos backup aquellas antenas que se encuentran a una distancia menor a \(D\) respecto a la antena en cuestión.
+        \item \textbf{Tamaño del Conjunto de Backup:} Para cada antena se debe seleccionar exactamente un conjunto de backup de tamaño \(k\).
+        \item \textbf{Restricción de Uso:} Una antena puede formar parte del backup de, a lo sumo, \(b\) otras antenas. Esto previene la sobrecarga y, en caso de fallo, evita que el problema se propague a una parte importante de la red.
+        \item \textbf{No Auto-backup:} Se asume que una antena no puede ser backup de sí misma (es decir, no existen bucles desde un nodo a sí mismo en la red de flujo).
+        \item \textbf{Linealidad y Exactitud:} Se supone que los datos son exactos y que las relaciones (por ejemplo, “estar a menos de \(D\)”) se definen de forma lineal y determinística.
+    \end{enumerate}
+    \end{itemize}
+
+    \subsection{Diseño del Algoritmo}
+El algoritmo se basa en la modelación del problema vía una red de flujo, y se resuelve mediante un algoritmo clásico (por ejemplo, Ford-Fulkerson, su variante escalada o Edmonds-Karp). A continuación se describen los pasos para adaptar los datos de entrada a una red de flujo y cómo interpretar la salida.
+
+\subsection{Adaptación a una Red de Flujo y Significado de la Salida}
+\paragraph{Construcción de la Red de Flujo:}
+Se genera un grafo dirigido que transformará el problema de asignación de backups en un problema de flujo:
+\begin{enumerate}[label=\alph*.]
+    \item \textbf{Nodos:}
+    \begin{itemize}
+        \item Se crea un nodo fuente \(S\) y un nodo sumidero \(T\).
+        \item Se representan las antenas en dos copias: la parte izquierda (o de origen) y la parte derecha (o de destino). La copia de la izquierda representa a cada antena que debe elegir \(k\) backups; la copia de la derecha representa a cada antena como potencial backup, con su límite de participación.
+    \end{itemize}
+    \item \textbf{Arcos desde la Fuente:}  
+    Se crea un arco desde \(S\) a cada antena (en la copia izquierda) con capacidad \(k\). Esto asegura que cada antena debe “enviar” \(k\) unidades de flujo, interpretadas como la cantidad de backups necesarios.
+    
+    \item \textbf{Arcos Intermedios:}  
+    Se conecta una antena \(i\) (de la copia izquierda) con una antena \(j\) (en la copia derecha) mediante un arco de capacidad 1 si y sólo si \(d[i,j] < D\). Esta condición garantiza que únicamente se consideren antenas \emph{cercanas} (según el umbral \(D\)).
+    
+    \item \textbf{Arcos al Sumidero:}  
+    Cada antena \(j\) (de la copia derecha) se conecta con el sumidero \(T\) mediante un arco de capacidad \(b\). Esto impone que ninguna antena sea asignada como backup a más de \(b\) antenas.
+\end{enumerate}
+
+\paragraph{Interpretación de la Salida:}
+Una vez construida la red, se ejecuta el algoritmo de flujo, Edmonds-Karp. Si el flujo máximo encontrado es exactamente \(n \cdot k\) (ya que cada una de las \(n\) antenas debe enviar \(k\) unidades de flujo), entonces:
+\begin{itemize}
+    \item La solución asigna, para cada antena \(i\), un conjunto de \(\{ j \mid \text{flujo en el arco } (i, j) = 1 \}\) de tamaño \(k\).
+    \item Cada antena \(j\) aparecerá en el conjunto de backup de al menos 0 y como máximo \(b\) antenas, dado el límite impuesto en el arco de \(j\) a \(T\).
+\end{itemize}
+Si el flujo máximo es menor que \(n \cdot k\), se concluye que no es posible asignar respaldos cumpliendo todas las restricciones.
+
+\paragraph{Diagrama de la Red de Flujo:}
+A continuación se muestra un diagrama esquemático de la modelación:
+
+\begin{center}
+\begin{tikzpicture}
+    % Nodos fuente y sumidero
+    \node[draw, circle] (S) at (0,0) {\(S\)};
+    \node[draw, circle] (T) at (8,0) {\(T\)};
+    
+    % Nodos del lado izquierdo (origen)
+    \node[draw, rectangle] (A1) at (2,-1) {\(1\)};
+    \node[draw, rectangle] (A2) at (2,-2) {\(2\)};
+    \node[draw, rectangle] (A3) at (2,-3) {\(\vdots\)};
+    
+    % Nodos del lado derecho (destino)
+    \node[draw, rectangle] (B1) at (6,-1) {\(1\)};
+    \node[draw, rectangle] (B2) at (6,-2) {\(2\)};
+    \node[draw, rectangle] (B3) at (6,-3) {\(\vdots\)};
+    
+    % Arcos de S a nodos de la izquierda (capacidad = k)
+    \draw[->] (S) -- (A1) node[midway, above] {\(k\)};
+    \draw[->] (S) -- (A2) node[midway, above] {\(k\)};
+    \draw[->] (S) -- (A3) node[midway, above] {\(k\)};
+    
+    % Arcos entre nodos izquierdos y derechos
+    \draw[->] (A1) -- (B2) node[midway, above] {\(1\)};
+    \draw[->] (A1) -- (B3) node[midway, above] {\(1\)};
+    \draw[->] (A2) -- (B1) node[midway, above] {\(1\)};
+    \draw[->] (A2) -- (B3) node[midway, above] {\(1\)};
+    
+    % Arcos de nodos de la derecha al sumidero (capacidad = b)
+    \draw[->] (B1) -- (T) node[midway, above] {\(b\)};
+    \draw[->] (B2) -- (T) node[midway, above] {\(b\)};
+    \draw[->] (B3) -- (T) node[midway, above] {\(b\)};
+\end{tikzpicture}
+
+\captionof{figure}{Modelo de Red de Flujo para la Asignación de Backups}
+\end{center}
+
+\subsection{Pseudocódigo y Estructuras de Datos Utilizadas}
+A continuación se presenta un pseudocódigo que resume el proceso completo:
+
+
+\begin{lstlisting}[frame=single, caption={Pseudocódigo para construir el grafo y asignar respaldo}]
+FUNCION Construir_Grafo(distancias, D, b, k):
+    n <-- longitud(distancias)
+    Crear grafo dirigido G vacio
+    fuente  <-- "S"
+    sumidero <-- "T"
+    
+    Agregar nodo fuente a G
+    Agregar nodo sumidero a G
+    
+    Para i desde 0 hasta n-1 hacer:
+        entrada <-- "in_" concatenado con i
+        salida  <-- "out_" concatenado con i
+        Agregar nodo "entrada" a G
+        Agregar nodo "salida" a G
+        Agregar arco (fuente, entrada) con capacidad k a G
+        Agregar arco (salida, sumidero) con capacidad b a G
+    
+    Para i desde 0 hasta n-1 hacer:
+        Para j desde 0 hasta n-1 hacer:
+            Si (i ! = j) y (distancias[i][j] < D) entonces:
+                Agregar arco ("in_" concatenado con i, "out_" concatenado con j)
+                con capacidad 1 a G  
+    Retornar G
+
+FUNCION Asignar_Respaldo(distancias, D, b, k):
+    G <-- Construir_Grafo(distancias, D, b, k)
+    (flujo_total, flujo) <-- CalcularFlujoMaximo(G, "S", "T")
+    n <-- longitud(distancias)
+    
+    Si flujo_total < n * k entonces:
+        Retornar "No existe solucion"
+    
+    resultado <-- arreglo de n listas vacias
+    
+    Para i desde 0 hasta n-1 hacer:
+        entrada <-- "in_" concatenado con i
+        Para j desde 0 hasta n-1 hacer:
+            Si (i ! = j) y (distancias[i][j] < D) entonces:
+                salida <-- "out_" concatenado con j
+                Si flujo[entrada][salida] = 1 entonces:
+                    Agregar j a resultado[i]
+    Imprimir resultado
+    Retornar resultado
+\end{lstlisting}
+
+\paragraph{Estructuras de Datos:}
+\begin{itemize}
+    \item \textbf{Grafo \(G\):} Representado mediante listas de adyacencia (o matriz de adyacencia) donde cada arco almacena su capacidad y flujo actual.
+    \item \textbf{Nodos:} Cada antena se divide en dos nodos (\(u_i\) y \(v_i\)) para representar su rol como emisor y receptor en la red.
+    \item \textbf{Cola:} En la implementación de Edmonds-Karp se utiliza una cola para el recorrido en anchura (BFS) en búsqueda de caminos aumentantes.
+    \item \textbf{Arcos:} Cada arco se representa como una estructura o tupla con información sobre el nodo origen, nodo destino, capacidad máxima y flujo actual.
+\end{itemize}
+\subsection{Ejemplo de Seguimiento con Datos Reducidos}
+
+Consideremos el siguiente set reducido de datos:
+
+\begin{itemize}
+    \item Número de antenas: \( n = 3 \).
+    \item Valor de umbral de distancia: \( D = 2 \).
+    \item Tamaño de respaldo requerido: \( k = 1 \) (cada antena necesita un backup).
+    \item Límite de apariciones como backup: \( b = 1 \) (cada antena puede servir como backup para, a lo sumo, una otra antena).
+    \item Matriz de distancias:
+      
+
+\[
+      \begin{pmatrix}
+      0 & 1 & 1 \\
+      1 & 0 & 1 \\
+      1 & 1 & 0 \\
+      \end{pmatrix}
+      \]
+
+
+\end{itemize}
+
+Dado que \(d[i][j] = 1 < D\) para \(i \neq j\), cada antena \(i\) podrá conectarse a las otras dos antenas \(j\).
+
+Sin embargo, considerando las restricciones de capacidad:
+\begin{itemize}
+  \item Cada antena debe suministrar \(k=1\) unidad al conjunto de backup.
+  \item Cada antena (como backup) puede recibir como máximo \(b=1\) unidad.
+\end{itemize}
+
+Se busca una asignación en la que la solución sea de la forma:
+
+
+\[
+\text{Backup de la antena } 0 \text{ es } 1,\quad
+\text{Backup de la antena } 1 \text{ es } 2,\quad
+\text{Backup de la antena } 2 \text{ es } 0.
+\]
+
+
+
+\subsection{Diagrama 1: Red de Flujo (Construcción Inicial)}
+
+El siguiente diagrama muestra la red de flujo construida a partir de los datos:
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm and 1.5cm, auto,
+    every node/.style={draw, align=center}]
+    % Nodos de la izquierda (entradas)
+    \node[circle] (S) at (-4,-4) {S};
+    \node (in0) at (-1,-1) {in\(_0\)};
+    \node (in1) at (-1,-4) {in\(_1\)};
+    \node (in2) at (-1,-7) {in\(_2\)};
+    
+    % Nodos de la derecha (salidas)
+    \node (out0) at (4,-1) {out\(_0\)};
+    \node (out1) at (4,-4) {out\(_1\)};
+    \node (out2) at (4,-7) {out\(_2\)};
+    
+    \node[circle] (T) at (8,-4) {T};
+    
+    % Arcos desde S hacia los nodos "in_i" (capacidad k=1)
+    \draw[->] (S) -- node[above] {1} (in0);
+    \draw[->] (S) -- node[above] {1} (in1);
+    \draw[->] (S) -- node[above] {1} (in2);
+    
+    % Arcos desde los nodos "out_i" hacia T (capacidad b=1)
+    \draw[->] (out0) -- node[above] {1} (T);
+    \draw[->] (out1) -- node[above] {1} (T);
+    \draw[->] (out2) -- node[above] {1} (T);
+    
+    % Arcos entre nodos "in_i" y "out_j" (i ≠ j, capacidad 1)
+    \draw[->] (in0) -- node[above, near start] {1} (out1);
+    \draw[->] (in0) -- node[above, near start] {1} (out2);
+    
+    \draw[->] (in1) -- node[above, near end] {1} (out0);
+    \draw[->] (in1) -- node[below, near end] {1} (out2);
+    
+    \draw[->] (in2) -- node[below, near end] {1} (out0);
+    \draw[->] (in2) -- node[below, near end] {1} (out1);
+\end{tikzpicture}
+\captionof{figure}{Red de flujo inicial construida a partir de los datos reducidos.}
+\end{center}
+
+\subsection{Diagrama 2: Red de Flujo con Flujo Asignado (Solución Óptima)}
+
+Suponiendo que el algoritmo de flujo encuentra la siguiente asignación:
+
+\[
+\begin{array}{lcl}
+\text{in}_0 & \to & \text{out}_1 \\[1mm]
+\text{in}_1 & \to & \text{out}_2 \\[1mm]
+\text{in}_2 & \to & \text{out}_0
+\end{array}
+\]
+
+
+el diagrama resaltado a continuación muestra la solución óptima (se dibujan los arcos seleccionados en rojo y gruesos):
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm and 1.5cm, auto,
+    every node/.style={draw, align=center}]
+    % Nodos de la izquierda (entradas)
+    \node[circle] (S) at (-2,-4) {S};
+    \node (in0) at (0,-2) {in\(_0\)};
+    \node (in1) at (0,-4) {in\(_1\)};
+    \node (in2) at (0,-6) {in\(_2\)};
+    
+    % Nodos de la derecha (salidas)
+    \node (out0) at (4,-2) {out\(_0\)};
+    \node (out1) at (4,-4) {out\(_1\)};
+    \node (out2) at (4,-6) {out\(_2\)};
+    
+    \node[circle] (T) at (8,-4) {T};
+    
+    % Arcos desde S hacia los nodos "in_i" (dibujo en gris)
+    \draw[->, dashed] (S) -- (in0);
+    \draw[->, dashed] (S) -- (in1);
+    \draw[->, dashed] (S) -- (in2);
+    
+    % Arcos desde los nodos "out_i" hacia T (dibujo en gris)
+    \draw[->, dashed] (out0) -- (T);
+    \draw[->, dashed] (out1) -- (T);
+    \draw[->, dashed] (out2) -- (T);
+    
+    % Arcos candidatos (sin seleccionar, en gris)
+    \draw[->, dashed] (in0) -- (out2);
+    \draw[->, dashed] (in1) -- (out0);
+    \draw[->, dashed] (in1) -- (out2);
+    \draw[->, dashed] (in2) -- (out1);
+    \draw[->, dashed] (in2) -- (out0);
+    
+    % Arcos seleccionados (solución óptima, en rojo y gruesos)
+    \draw[->, very thick, red] (in0) -- (out1);
+    \draw[->, very thick, red] (in1) -- (out2);
+    \draw[->, very thick, red] (in2) -- (out0);
+\end{tikzpicture}
+\captionof{figure}{Red de flujo con la asignación óptima: antena 0 respalda a 1, 1 respalda a 2 y 2 respalda a 0.}
+\end{center}
+
+\subsection{Interpretación del Ejemplo}
+
+Con la solución óptima obtenida:
+\begin{itemize}
+  \item La antena 0 utiliza la conexión \( \mathtt{in\_0} \to \mathtt{out\_1} \) para asignar a la antena 1 como backup.
+  \item La antena 1 utiliza \( \mathtt{in\_1} \to \mathtt{out\_2} \) para asignar a la antena 2.
+  \item La antena 2 utiliza \( \mathtt{in\_2} \to \mathtt{out\_0} \) para asignar a la antena 0.
+\end{itemize}
+
+El flujo total alcanzado es igual a \( n \times k = 3 \times 1 = 3 \), lo que indica que se cumple la restricción y se ha encontrado una solución válida. Si el flujo total hubiese sido menor, el algoritmo habría informado que no existe solución posible bajo las restricciones \( D \), \( b \) y \( k \) definidas.
+
+\subsection{Conclusión}
+
+El ejemplo implementado con un set de datos reducido ilustra cómo se transforma el problema de asignación de respaldos en una red de flujo, utilizando la división en nodos de entrada y salida y estableciendo capacidades según los parámetros \(k\) y \(b\). 
+
+\subsection{Análisis de Complejidad}
+
+
+\subsection*{Función \texttt{Construir\_Grafo}}
+
+\begin{itemize}
+    \item  Obtener la longitud de la matriz de distancias. \\
+    \hspace*{1em} $\Rightarrow \mathcal{O}(1)$
+    
+    \item  Creación de nodos especiales (\texttt{S}, \texttt{T}) y el grafo vacío. \\
+    \hspace*{1em} $\Rightarrow \mathcal{O}(1)$
+
+    \item  Bucle sobre $n$ nodos para crear nodos de entrada/salida y conectar fuente y sumidero. \\
+    \hspace*{1em} Cada iteración realiza operaciones constantes. Total: $\mathcal{O}(n)$
+
+    \item  Doble bucle anidado para agregar aristas de respaldo entre pares de nodos. \\
+    \hspace*{1em} Hay $n(n-1)$ comparaciones posibles, cada una con operaciones constantes. \\
+    \hspace*{1em} $\Rightarrow \mathcal{O}(n^2)$
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Complejidad total de \texttt{Construir\_Grafo}:}
+\[
+\boxed{\mathcal{O}(n^2)}
+\]
+
+\subsection{Función \texttt{Asignar\_Respaldo}}
+
+\begin{itemize}
+    \item  Llamada a \texttt{Construir\_Grafo}. Ya sabemos que es $\mathcal{O}(n^2)$
+
+    \item Cálculo de flujo máximo en un grafo de tamaño:
+    \begin{itemize}
+        \item Nodos: $2n + 2$ (entrada/salida por nodo, fuente y sumidero)
+        \item Aristas: Hasta $2n$ (fuente y sumidero) + $n(n - 1)$ (entre entradas y salidas)
+        \item Usando el algoritmo de Edmonds-Karp (por defecto en NetworkX): \\
+        \[
+        \mathcal{O}(V \cdot E^2) = \mathcal{O}(n \cdot (n^2)^2) = \mathcal{O}(n^5)
+        \]
+    \end{itemize}
+
+    \item \textbf Obtener longitud de matriz: $\mathcal{O}(1)$
+
+    \item \textbf Comparación: $\mathcal{O}(1)$
+
+    \item \textbf Inicializar arreglo de $n$ listas vacías: $\mathcal{O}(n)$
+
+    \item \textbf  Doble bucle sobre nodos ($n \times n$) y acceso al flujo:
+    \begin{itemize}
+        \item Comparaciones y accesos al diccionario de flujo: operaciones constantes.
+        \item Total: $\mathcal{O}(n^2)$ 
+    \end{itemize}
+       \item \textbf imprimir resultado: $\mathcal{O}(n^2)$
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Complejidad total de \texttt{Asignar\_Respaldo}:}
+\[
+\boxed{\mathcal{O}(n^5)}
+\]
+
+\subsection{Conclusión}
+A pesar de haber realizado el grafico y las operaciones necesarias en una complejidad menor que $N^2$, la complejidad se ve afectada por el uso de Edmonds-Karp.
+
+\subsection{Generación de sets}
+\begin{itemize}
+    \item Los sets fueron generados arbitrariamente, para poder probar casos con una matriz cada vez mas grande.
+\end{itemize}
+
+\section{Referencias}
+\begin{itemize}
+
+\item Edmonds, J., \& Karp, R. M. (1972). Theoretical improvements in algorithmic efficiency for network flow problems. \textit{Journal of the ACM, 19}(2), 248–264. https://doi.org/10.1145/321607.321609
+\item Hagberg, A. A., Schult, D. A., \& Swart, P. J. (2008). \textit{Exploring network structure, dynamics, and function using NetworkX}. In \textit{Proceedings of the 7th Python in Science Conference (SciPy2008)} (pp. 11–15). SciPy Conference.
+\item Mitchell, S. (n.d.). \textit{PuLP: A linear programming modeler written in Python} [Computer software]. Recuperado el 1 de octubre de 2025, de \url{https://coin-or.github.io/pulp/}
+\end{itemize}
 \end{document}
