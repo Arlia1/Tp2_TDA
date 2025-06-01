@@ -22,16 +22,16 @@ python3 ej1pd.py
 ```
 # Ejercicio 2 
 
-Este archivo describe cómo ejecutar el script.
+Este archivo describe cómo ejecutar el script para resolver el ejercicio de **programacion lineal**.
 
 
 ## Ejecución
 
-Para ejecutar el archivo con la resolucion del ejercicio 2, utiliza el siguiente comando en la terminal:
+Para ejecutar el archivo con la resolucion del ejercicio 2, **Programación Lineal**, utiliza el siguiente comando en la terminal:
 
 ```bash
-cd 
-python3 
+cd ejercicio2.pl
+python3 ejercicio_2.py
 ```
 
 # Ejercicio 3 
