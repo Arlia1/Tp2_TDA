@@ -4,12 +4,15 @@ Este archivo describe cómo ejecutar el script `ej1pd.py`.
 
 ## Requisitos
 
-Se requiere tener instalado Python 3 en el sistema. Para instalarlo, sigue los pasos según tu sistema operativo:
+Se requiere tener instalado Python 3, pip para instalar librerias de Phyton PuLP, y networkX en el sistema. Para instalarlo, sigue los pasos según tu sistema operativo:
 
 ### En Ubuntu/Debian:
 ```bash
 sudo apt update
 sudo apt install python3
+python get-pip.py
+pip install networkx
+pip install pulp
 ```
 
 ## Ejecución
