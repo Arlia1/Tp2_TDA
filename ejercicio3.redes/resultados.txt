@@ -1,0 +1,30 @@
+Set 2:
+  Nodo 0 respaldado por: [1]
+  Nodo 1 respaldado por: [0]
+
+Set 3:
+  Nodo 0 respaldado por: [1]
+  Nodo 1 respaldado por: [0]
+  Nodo 2 respaldado por: [0]
+
+Set 4:
+  Nodo 0 respaldado por: [1]
+  Nodo 1 respaldado por: [2]
+  Nodo 2 respaldado por: [0]
+  Nodo 3 respaldado por: [0]
+
+Set 5:
+  Nodo 0 respaldado por: [1]
+  Nodo 1 respaldado por: [2]
+  Nodo 2 respaldado por: [1]
+  Nodo 3 respaldado por: [0]
+  Nodo 4 respaldado por: [0]
+
+Set 6:
+  Nodo 0 respaldado por: [2, 3]
+  Nodo 1 respaldado por: [2, 3]
+  Nodo 2 respaldado por: [3, 4]
+  Nodo 3 respaldado por: [0, 1]
+  Nodo 4 respaldado por: [0, 1]
+  Nodo 5 respaldado por: [0, 1]
+
