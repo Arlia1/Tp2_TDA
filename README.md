@@ -36,13 +36,13 @@ python3 ejercicio_2.py
 
 # Ejercicio 3 
 
-Este archivo describe cómo ejecutar el script .
+Este archivo describe cómo ejecutar el script para resolver el problema de **Redes de flujo**.
 
 ## Ejecución
 
-Para ejecutar el archivo con la resolucion del ejercicio 2, utiliza el siguiente comando en la terminal:
+Para ejecutar el archivo con la resolucion del ejercicio 3 **redes de flujo**, utiliza el siguiente comando en la terminal:
 
 ```bash
-cd
-python3 
+cd ejercicio3.redes
+python3 redes.py
 ```
