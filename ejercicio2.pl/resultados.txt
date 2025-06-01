@@ -1,0 +1,10 @@
+Estado: Optimal
+a: 1
+b_1: 1
+b_2: 0
+c: 1
+d: 0
+e: 1
+f: 0
+g: 0
+Ganancia total: 255000.0
