@@ -405,13 +405,13 @@ Se genera un grafo dirigido que transformará el problema de asignación de back
         \item Se crea un nodo fuente \(S\) y un nodo sumidero \(T\).
         \item Se representan las antenas en dos copias: la parte izquierda (o de origen) y la parte derecha (o de destino). La copia de la izquierda representa a cada antena que debe elegir \(k\) backups; la copia de la derecha representa a cada antena como potencial backup, con su límite de participación.
     \end{itemize}
-    \item \textbf{Arcos desde la Fuente:}  
+    \item \textbf{Aristas desde la Fuente:}  
     Se crea un arco desde \(S\) a cada antena (en la copia izquierda) con capacidad \(k\). Esto asegura que cada antena debe “enviar” \(k\) unidades de flujo, interpretadas como la cantidad de backups necesarios.
     
-    \item \textbf{Arcos Intermedios:}  
+    \item \textbf{Aristas Intermedios:}  
     Se conecta una antena \(i\) (de la copia izquierda) con una antena \(j\) (en la copia derecha) mediante un arco de capacidad 1 si y sólo si \(d[i,j] < D\). Esta condición garantiza que únicamente se consideren antenas \emph{cercanas} (según el umbral \(D\)).
     
-    \item \textbf{Arcos al Sumidero:}  
+    \item \textbf{Aristas al Sumidero:}  
     Cada antena \(j\) (de la copia derecha) se conecta con el sumidero \(T\) mediante un arco de capacidad \(b\). Esto impone que ninguna antena sea asignada como backup a más de \(b\) antenas.
 \end{enumerate}
 
@@ -442,18 +442,18 @@ A continuación se muestra un diagrama esquemático de la modelación:
     \node[draw, rectangle] (B2) at (6,-2) {\(2\)};
     \node[draw, rectangle] (B3) at (6,-3) {\(\vdots\)};
     
-    % Arcos de S a nodos de la izquierda (capacidad = k)
+    % Aristas de S a nodos de la izquierda (capacidad = k)
     \draw[->] (S) -- (A1) node[midway, above] {\(k\)};
     \draw[->] (S) -- (A2) node[midway, above] {\(k\)};
     \draw[->] (S) -- (A3) node[midway, above] {\(k\)};
     
-    % Arcos entre nodos izquierdos y derechos
+    % Aristas entre nodos izquierdos y derechos
     \draw[->] (A1) -- (B2) node[midway, above] {\(1\)};
     \draw[->] (A1) -- (B3) node[midway, above] {\(1\)};
     \draw[->] (A2) -- (B1) node[midway, above] {\(1\)};
     \draw[->] (A2) -- (B3) node[midway, above] {\(1\)};
     
-    % Arcos de nodos de la derecha al sumidero (capacidad = b)
+    % Aristas de nodos de la derecha al sumidero (capacidad = b)
     \draw[->] (B1) -- (T) node[midway, above] {\(b\)};
     \draw[->] (B2) -- (T) node[midway, above] {\(b\)};
     \draw[->] (B3) -- (T) node[midway, above] {\(b\)};
@@ -517,7 +517,7 @@ FUNCION Asignar_Respaldo(distancias, D, b, k):
     \item \textbf{Grafo \(G\):} Representado mediante listas de adyacencia (o matriz de adyacencia) donde cada arco almacena su capacidad y flujo actual.
     \item \textbf{Nodos:} Cada antena se divide en dos nodos (\(u_i\) y \(v_i\)) para representar su rol como emisor y receptor en la red.
     \item \textbf{Cola:} En la implementación de Edmonds-Karp se utiliza una cola para el recorrido en anchura (BFS) en búsqueda de caminos aumentantes.
-    \item \textbf{Arcos:} Cada arco se representa como una estructura o tupla con información sobre el nodo origen, nodo destino, capacidad máxima y flujo actual.
+    \item \textbf{Aristas:} Cada arco se representa como una estructura o tupla con información sobre el nodo origen, nodo destino, capacidad máxima y flujo actual.
 \end{itemize}
 \subsection{Ejemplo de Seguimiento con Datos Reducidos}
 
@@ -581,17 +581,17 @@ El siguiente diagrama muestra la red de flujo construida a partir de los datos:
     
     \node[circle] (T) at (8,-4) {T};
     
-    % Arcos desde S hacia los nodos "in_i" (capacidad k=1)
+    % Aristas desde S hacia los nodos "in_i" (capacidad k=1)
     \draw[->] (S) -- node[above] {1} (in0);
     \draw[->] (S) -- node[above] {1} (in1);
     \draw[->] (S) -- node[above] {1} (in2);
     
-    % Arcos desde los nodos "out_i" hacia T (capacidad b=1)
+    % Aristas desde los nodos "out_i" hacia T (capacidad b=1)
     \draw[->] (out0) -- node[above] {1} (T);
     \draw[->] (out1) -- node[above] {1} (T);
     \draw[->] (out2) -- node[above] {1} (T);
     
-    % Arcos entre nodos "in_i" y "out_j" (i ≠ j, capacidad 1)
+    % Aristas entre nodos "in_i" y "out_j" (i ≠ j, capacidad 1)
     \draw[->] (in0) -- node[above, near start] {1} (out1);
     \draw[->] (in0) -- node[above, near start] {1} (out2);
     
@@ -617,7 +617,7 @@ Suponiendo que el algoritmo de flujo encuentra la siguiente asignación:
 \]
 
 
-el diagrama resaltado a continuación muestra la solución óptima (se dibujan los arcos seleccionados en rojo y gruesos):
+el diagrama resaltado a continuación muestra la solución óptima (se dibujan los arista seleccionados en rojo y gruesos):
 
 \begin{center}
 \begin{tikzpicture}[node distance=1.5cm and 1.5cm, auto,
@@ -635,24 +635,24 @@ el diagrama resaltado a continuación muestra la solución óptima (se dibujan l
     
     \node[circle] (T) at (8,-4) {T};
     
-    % Arcos desde S hacia los nodos "in_i" (dibujo en gris)
+    % Aristas desde S hacia los nodos "in_i" (dibujo en gris)
     \draw[->, dashed] (S) -- (in0);
     \draw[->, dashed] (S) -- (in1);
     \draw[->, dashed] (S) -- (in2);
     
-    % Arcos desde los nodos "out_i" hacia T (dibujo en gris)
+    % Aristas desde los nodos "out_i" hacia T (dibujo en gris)
     \draw[->, dashed] (out0) -- (T);
     \draw[->, dashed] (out1) -- (T);
     \draw[->, dashed] (out2) -- (T);
     
-    % Arcos candidatos (sin seleccionar, en gris)
+    % Aristas candidatos (sin seleccionar, en gris)
     \draw[->, dashed] (in0) -- (out2);
     \draw[->, dashed] (in1) -- (out0);
     \draw[->, dashed] (in1) -- (out2);
     \draw[->, dashed] (in2) -- (out1);
     \draw[->, dashed] (in2) -- (out0);
     
-    % Arcos seleccionados (solución óptima, en rojo y gruesos)
+    % Aristas seleccionados (solución óptima, en rojo y gruesos)
     \draw[->, very thick, red] (in0) -- (out1);
     \draw[->, very thick, red] (in1) -- (out2);
     \draw[->, very thick, red] (in2) -- (out0);
@@ -716,13 +716,13 @@ El ejemplo implementado con un set de datos reducido ilustra cómo se transforma
         \]
     \end{itemize}
 
-    \item \textbf Obtener longitud de matriz: $\mathcal{O}(1)$
+    \item  Obtener longitud de matriz: $\mathcal{O}(1)$
 
-    \item \textbf Comparación: $\mathcal{O}(1)$
+    \item  Comparación: $\mathcal{O}(1)$
 
-    \item \textbf Inicializar arreglo de $n$ listas vacías: $\mathcal{O}(n)$
+    \item  Inicializar arreglo de $n$ listas vacías: $\mathcal{O}(n)$
 
-    \item \textbf  Doble bucle sobre nodos ($n \times n$) y acceso al flujo:
+    \item   Doble bucle sobre nodos ($n \times n$) y acceso al flujo:
     \begin{itemize}
         \item Comparaciones y accesos al diccionario de flujo: operaciones constantes.
         \item Total: $\mathcal{O}(n^2)$ 
@@ -737,12 +737,84 @@ El ejemplo implementado con un set de datos reducido ilustra cómo se transforma
 \]
 
 \subsection{Conclusión}
-A pesar de haber realizado el grafico y las operaciones necesarias en una complejidad menor que $N^2$, la complejidad se ve afectada por el uso de Edmonds-Karp.
+A pesar de haber realizado el gráfico y las operaciones necesarias en una complejidad menor que $N^2$, la complejidad se ve afectada por el uso de Edmonds-Karp.
 
 \subsection{Generación de sets}
 \begin{itemize}
     \item Los sets fueron generados arbitrariamente, para poder probar casos con una matriz cada vez mas grande.
 \end{itemize}
+
+\subsection{Análisis de complejidad y resultados}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{cc}
+        \hline
+        \textbf{Matriz \(n \times n\)} & \textbf{Tiempo (ms)} \\ \hline
+        4N & 2.3677 \\
+        9N & 2.4239 \\
+        16N & 2.7826 \\
+        25N & 3.5207 \\
+        36N & 4.8964 \\ \hline
+    \end{tabular}
+    \caption{Tiempos de ejecución (en milisegundos) para diferentes tamaños de matriz.}
+    \label{tab:tiempos}
+\end{table}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm,
+    height=8cm,
+    xlabel={Tamaño de la matriz (n x n)},
+    ylabel={Tiempo (ms)},
+    xtick=data,
+    xticklabel style={rotate=45},
+    symbolic x coords={4N, 9N, 16N, 25N, 36N},
+    ymin=0,
+    grid=major,
+    nodes near coords,
+    every node near coord/.append style={font=\footnotesize},
+    title={Tiempo de ejecución según el tamaño de la matriz},
+]
+\addplot[
+    color=blue,
+    mark=*,
+    thick,
+    smooth,
+] coordinates {
+    (4N, 2.3677)
+    (9N, 2.4239)
+    (16N, 2.7826)
+    (25N, 3.5207)
+    (36N, 4.8964)
+};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={$x$},
+            ylabel={$f(x)=x^5$},
+            domain=0:6,        % Dominio para x
+            samples=1000,        % Más muestras para suavizar la curva
+            grid=both,
+            axis lines=middle,
+            xmin=0, xmax=6,
+            ymin=0, ymax=7776,   % Ajusta según el rango deseado
+            axis lines=middle,  % Dibuja los ejes en posición central
+            enlargelimits=true
+        ]
+            \addplot[blue, thick] {x^5};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Gráfico de la función \(x^5\).}
+\end{figure}
+\subsection{Conclusión de análisis de complejidad}
+\text Los resultados muestran que tiende a cumplir con la curva esperada, a pesar de no ser tan exponencial su escalada en comparación con los datos ingresados.
 
 \section{Referencias}
 \begin{itemize}
